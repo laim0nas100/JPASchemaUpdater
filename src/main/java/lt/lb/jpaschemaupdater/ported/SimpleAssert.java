@@ -1,15 +1,23 @@
 package lt.lb.jpaschemaupdater.ported;
 
-import lt.lb.commons.parsing.StringOp;
+import java.util.Objects;
+import lt.lb.commons.Log;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.jpa.HibernatePersistenceProvider;
+
 
 /**
  *
  * @author Lemmin
  */
 public class SimpleAssert {
+    
+    public static <T> T notNull(T object){
+        return Objects.requireNonNull(object);
+    }
 
     public static String notBlank(String str) {
-        not(str, StringOp::isAllBlank, "Has to be not blank");
+        not(str, StringUtils::isAllBlank, "Has to be not blank");
         return str;
     }
 
@@ -41,6 +49,5 @@ public class SimpleAssert {
         }
 
     }
-
     
 }

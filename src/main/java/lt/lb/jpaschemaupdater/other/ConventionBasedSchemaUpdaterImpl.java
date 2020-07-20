@@ -48,11 +48,11 @@ public class ConventionBasedSchemaUpdaterImpl implements InitializingBean {
 
         try {
             Resource[] resources = this.getResourcePatternResolver().getResources(this.getPattern());
-            Resource[] arr$ = resources;
-            int len$ = resources.length;
+            Resource[] arr = resources;
+            int len = resources.length;
 
-            for(int i$ = 0; i$ < len$; ++i$) {
-                Resource resource = arr$[i$];
+            for(int i = 0; i < len; ++i) {
+                Resource resource = arr[i];
                 ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
                 this.configurePopulator(resource, populator);
                 Long ver = getVersionResolver().getVersion(resource)- 1L;

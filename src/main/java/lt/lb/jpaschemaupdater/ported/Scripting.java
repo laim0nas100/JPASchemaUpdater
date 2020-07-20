@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lt.lb.jpaschemaupdater.ported;
 
 import java.io.IOException;
@@ -13,21 +8,26 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
+import javax.sql.DataSource;
 import static lt.lb.jpaschemaupdater.ported.SimpleAssert.not;
 import static lt.lb.jpaschemaupdater.ported.SimpleAssert.notBlank;
+import static lt.lb.jpaschemaupdater.ported.SimpleAssert.notNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateStategy.ConnectionSchemaUpdateStrategy;
 
 /**
  *
- * @author Lemmin
+ * Copied relevant functions from Spring's ScriptUtils
+ * @author laim0nas100
  */
 public class Scripting {
 
     private static final Log logger = LogFactory.getLog(Scripting.class);
 
-    public static class ScriptEx extends RuntimeException {
+    public static class ScriptEx extends JPASchemaUpdateException {
 
         /**
          * Constructor for {@code ScriptException}.
@@ -140,7 +140,7 @@ public class Scripting {
     public static void splitSqlScript(String script, ScriptReadOptions opt, List<String> statements)
             throws ScriptEx {
 
-        not(script, StringUtils::isAllBlank, "'script' must not be null or empty");
+        notBlank(script);
 
         StringBuilder sb = new StringBuilder();
         boolean inSingleQuote = false;
