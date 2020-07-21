@@ -45,7 +45,7 @@ public class ResourceReadingUtils {
     }
 
     public static String getFileNameNoExt(URL resource) throws URISyntaxException {
-        String name = Paths.get(resource.toURI()).getFileName().toString();
+        String name = FilenameUtils.getName(resource.getFile());
         return FilenameUtils.removeExtension(name);
     }
 }

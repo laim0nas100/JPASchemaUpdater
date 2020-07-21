@@ -6,7 +6,7 @@ package lt.lb.jpaschemaupdater.ported;
  */
 public interface JPASchemaUpdater {
 
-    public JPASchemaInstanceMaker getInstanceMaker();
+    public JPASchemaUpdateInstanceMaker getInstanceMaker();
 
     public JPASchemaUpdateCommiter getUpdateCommiter();
 

@@ -179,30 +179,66 @@ public interface ManagedAccess extends AutoCloseable {
 
         @Override
         public void beginTransaction() {
-            for(ManagedAccess m:managers){
+            for (ManagedAccess m : managers) {
                 m.beginTransaction();
             }
         }
 
         @Override
         public void rollback() {
-            for(ManagedAccess m:managers){
+            for (ManagedAccess m : managers) {
                 m.rollback();
             }
         }
 
         @Override
         public void commit() {
-            for(ManagedAccess m:managers){
+            for (ManagedAccess m : managers) {
                 m.commit();
             }
         }
 
         @Override
         public void close() {
-            for(ManagedAccess m:managers){
+            for (ManagedAccess m : managers) {
                 m.close();
             }
+        }
+
+    }
+
+    public static class UnmanagedEm implements ManagedAccess {
+
+        protected EntityManager entityManager;
+
+        public UnmanagedEm(EntityManager em) {
+            this.entityManager = em;
+        }
+
+        @Override
+        public Connection getConnection() {
+            return null;
+        }
+
+        @Override
+        public EntityManager getEntityManager() {
+            return entityManager;
+        }
+
+        @Override
+        public void beginTransaction() {
+        }
+
+        @Override
+        public void rollback() {
+        }
+
+        @Override
+        public void commit() {
+        }
+
+        @Override
+        public void close() {
         }
 
     }

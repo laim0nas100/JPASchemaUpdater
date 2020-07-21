@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lt.lb.jpaschemaupdater.ported.JPASchemaInstanceMaker;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstance;
 import lt.lb.jpaschemaupdater.ported.ManagedAccessFactory;
 import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
 import lt.lb.jpaschemaupdater.ported.misc.ResourceReadingUtils;
 import lt.lb.jpaschemaupdater.ported.misc.Scripting.ScriptReadOptions;
+import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstanceMaker;
 
 /**
  *
- * @author Laimonas-Beniusis-PC
+ * @author laimm0nas100
  */
-public class ResourceSchemaInstanceMaker<T extends ResourceSchemaInstanceMaker> implements JPASchemaInstanceMaker {
+public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateInstanceMaker> implements JPASchemaUpdateInstanceMaker {
 
     protected List<URL> resourceFiles = new ArrayList<>();
     protected List<JPASchemaUpdateInstance> instances;
@@ -55,6 +55,7 @@ public class ResourceSchemaInstanceMaker<T extends ResourceSchemaInstanceMaker> 
 
         public void setPattern(String pattern) {
             this.pattern = pattern;
+            this.compiled = null;
         }
 
         public Pattern getCompiledPattern() {
@@ -66,16 +67,28 @@ public class ResourceSchemaInstanceMaker<T extends ResourceSchemaInstanceMaker> 
 
     }
 
-    public ResourceSchemaInstanceMaker() {
+    public ResourceSchemaUpdateInstanceMaker() {
 
     }
 
-    public ResourceSchemaInstanceMaker(ScriptReadOptions defaultOptions) {
+    public ResourceSchemaUpdateInstanceMaker(ScriptReadOptions defaultOptions, ManagedAccessFactory managedAccessFactory) {
         this.defaultOptions = defaultOptions;
+        this.managedAccessFactory = managedAccessFactory;
     }
+
 
     public T addResource(URL res) {
         resourceFiles.add(res);
+        return (T) this;
+    }
+    
+    public T addPattern(ScriptOptionsByFilePattern pat){
+        this.regexPatterns.add(pat);
+        return (T) this;
+    }
+    
+    public T addPattern(String str, ScriptReadOptions opt){
+        this.regexPatterns.add(new ScriptOptionsByFilePattern(opt, str));
         return (T) this;
     }
 
@@ -101,10 +114,6 @@ public class ResourceSchemaInstanceMaker<T extends ResourceSchemaInstanceMaker> 
         } catch (URISyntaxException ex) {
             throw new JPASchemaUpdateException(ex);
         }
-    }
-
-    public void setInstances(List<JPASchemaUpdateInstance> instances) {
-        this.instances = instances;
     }
 
     public List<URL> getResourceFiles() {

@@ -13,6 +13,11 @@ public class SimpleAssert {
     public static <T> T notNull(T object){
         return Objects.requireNonNull(object);
     }
+    
+    public static String notEmpty(String str) {
+        not(str, StringUtils::isAllEmpty, "Has to be not empty");
+        return str;
+    }
 
     public static String notBlank(String str) {
         not(str, StringUtils::isAllBlank, "Has to be not blank");

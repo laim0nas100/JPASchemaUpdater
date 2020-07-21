@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notBlank;
+import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notEmpty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -202,11 +203,11 @@ public class Scripting {
 
         public ScriptReadOptions(String commentPrefix, String separator, String blockCommentStartDelimiter, String blockCommentEndDelimiter, String eofStatementSeparator, String fallbackStatementSeparator) {
             this.commentPrefix = notBlank(commentPrefix);
-            this.separator = notBlank(separator);
+            this.separator = notEmpty(separator);
             this.blockCommentStartDelimiter = notBlank(blockCommentStartDelimiter);
             this.blockCommentEndDelimiter = notBlank(blockCommentEndDelimiter);
             this.eofStatementSeparator = notBlank(eofStatementSeparator);
-            this.fallbackStatementSeparator = notBlank(fallbackStatementSeparator);
+            this.fallbackStatementSeparator = notEmpty(fallbackStatementSeparator);
 
         }
 

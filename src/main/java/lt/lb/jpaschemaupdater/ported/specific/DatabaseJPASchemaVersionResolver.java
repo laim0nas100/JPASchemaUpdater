@@ -2,6 +2,7 @@ package lt.lb.jpaschemaupdater.ported.specific;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
@@ -12,13 +13,13 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaVersionResolver;
  *
  * @author laim0nas100
  */
-public class DatabaseJPASchemaUpdate implements JPASchemaVersionResolver {
+public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolver {
 
     protected DataSource source;
     protected String versionSelectQuery;
     protected String versionUpdatePreparedStatement;
     
-    public DatabaseJPASchemaUpdate(){
+    public DatabaseJPASchemaVersionResolver(){
         
     }
 
@@ -28,7 +29,7 @@ public class DatabaseJPASchemaUpdate implements JPASchemaVersionResolver {
      * @param versionSelectQuery query that returns single result Long
      * @param versionUpdatePreparedStatement prepared statement query that accepts 1 Long parameter
      */
-    public DatabaseJPASchemaUpdate(DataSource source, String versionSelectQuery, String versionUpdatePreparedStatement) {
+    public DatabaseJPASchemaVersionResolver(DataSource source, String versionSelectQuery, String versionUpdatePreparedStatement) {
         this.source = source;
         this.versionSelectQuery = versionSelectQuery;
         this.versionUpdatePreparedStatement = versionUpdatePreparedStatement;
@@ -67,7 +68,9 @@ public class DatabaseJPASchemaUpdate implements JPASchemaVersionResolver {
         try {
             connection = source.getConnection();
             Statement st = connection.createStatement();
-            version = st.executeQuery(versionSelectQuery).getLong(1);
+            ResultSet rs = st.executeQuery(versionSelectQuery);
+            rs.next();
+            version = rs.getLong(1);
         } catch (Exception ex) {
             throw new JPASchemaUpdateException(ex);
         } finally {

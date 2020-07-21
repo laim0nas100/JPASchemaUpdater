@@ -1,8 +1,8 @@
 package lt.lb.jpaschemaupdater.ported.specific;
 
-import lt.lb.jpaschemaupdater.ported.JPASchemaInstanceMaker;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateCommiter;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdater;
+import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstanceMaker;
 
 /**
  *
@@ -10,16 +10,24 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaUpdater;
  */
 public class DefaultJPASchemaUpdater implements JPASchemaUpdater{
 
-    protected JPASchemaInstanceMaker instanceMaker;
+    protected JPASchemaUpdateInstanceMaker instanceMaker;
     protected JPASchemaUpdateCommiter updateCommiter;
 
+    public DefaultJPASchemaUpdater() {
+    }
+
+    public DefaultJPASchemaUpdater(JPASchemaUpdateInstanceMaker instanceMaker, JPASchemaUpdateCommiter updateCommiter) {
+        this.instanceMaker = instanceMaker;
+        this.updateCommiter = updateCommiter;
+    }
+    
     
     @Override
-    public JPASchemaInstanceMaker getInstanceMaker() {
+    public JPASchemaUpdateInstanceMaker getInstanceMaker() {
         return instanceMaker;
     }
 
-    public void setInstanceMaker(JPASchemaInstanceMaker instanceMaker) {
+    public void setInstanceMaker(JPASchemaUpdateInstanceMaker instanceMaker) {
         this.instanceMaker = instanceMaker;
     }
 
