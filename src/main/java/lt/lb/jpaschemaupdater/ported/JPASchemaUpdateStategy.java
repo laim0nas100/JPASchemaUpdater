@@ -16,7 +16,7 @@ public interface JPASchemaUpdateStategy {
      *
      * @param conn
      */
-    public void doUpdate(ManagedAccess conn);
+    public void doUpdate(ManagedAccess conn) ;
 
     /**
      * Update strategy with provided entity manager

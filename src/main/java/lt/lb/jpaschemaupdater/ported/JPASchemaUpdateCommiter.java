@@ -17,22 +17,27 @@ public interface JPASchemaUpdateCommiter {
      * Establish transactions and do the updates
      *
      * @param instance
+     * @throws java.lang.Exception
      */
     public default void doUpdate(JPASchemaUpdateInstance instance) throws Exception {
 
         ManagedAccessFactory managedAccessFactory = instance.getManagedAccessFactory();
-        try (ManagedAccess ma = managedAccessFactory.create()) {
+        try ( ManagedAccess ma = managedAccessFactory.create()) {
             try {
                 ma.beginTransaction();
-                for (JPASchemaUpdateStategy strategy : instance.getUpdates()) {
-                    strategy.doUpdate(ma);
-                }
+                inTransaction(instance, ma);
                 ma.commit();
             } catch (Exception ex) {
                 ma.rollback();
                 throw new JPASchemaUpdateException(ex);
             }
 
+        }
+    }
+
+    public default void inTransaction(JPASchemaUpdateInstance instance, ManagedAccess ma) {
+        for (JPASchemaUpdateStategy strategy : instance.getUpdates()) {
+            strategy.doUpdate(ma);
         }
     }
 
