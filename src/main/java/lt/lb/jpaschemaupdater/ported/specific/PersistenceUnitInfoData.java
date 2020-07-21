@@ -1,5 +1,5 @@
 
-package lt.lb.jpaschemaupdater.ported;
+package lt.lb.jpaschemaupdater.ported.specific;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import javax.persistence.spi.PersistenceUnitTransactionType;
 
 public class PersistenceUnitInfoData implements PersistenceUnitInfo {
     
-    public String JPA_VERSION = "2.1";
+    public String persistenceXMLSchemaVersion = "2.1";
     public String persistenceProviderClassName = "org.hibernate.jpa.HibernatePersistenceProvider";
     public String persistenceUnitName;
     public PersistenceUnitTransactionType transactionType = PersistenceUnitTransactionType.RESOURCE_LOCAL;
@@ -112,7 +112,7 @@ public class PersistenceUnitInfoData implements PersistenceUnitInfo {
  
     @Override
     public String getPersistenceXMLSchemaVersion() {
-        return JPA_VERSION;
+        return persistenceXMLSchemaVersion;
     }
  
     @Override
@@ -129,4 +129,5 @@ public class PersistenceUnitInfoData implements PersistenceUnitInfo {
     public ClassLoader getNewTempClassLoader() {
         return this.newTempClassLoader.get();
     }
+
 }

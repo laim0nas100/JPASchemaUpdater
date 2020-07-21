@@ -1,4 +1,4 @@
-package lt.lb.jpaschemaupdater.ported;
+package lt.lb.jpaschemaupdater.ported.misc;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -8,15 +8,10 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
-import javax.sql.DataSource;
-import static lt.lb.jpaschemaupdater.ported.SimpleAssert.not;
-import static lt.lb.jpaschemaupdater.ported.SimpleAssert.notBlank;
-import static lt.lb.jpaschemaupdater.ported.SimpleAssert.notNull;
+import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notBlank;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateStategy.ConnectionSchemaUpdateStrategy;
 
 /**
  *
@@ -26,28 +21,6 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateStategy.ConnectionSchemaUpda
 public class Scripting {
 
     private static final Log logger = LogFactory.getLog(Scripting.class);
-
-    public static class ScriptEx extends JPASchemaUpdateException {
-
-        /**
-         * Constructor for {@code ScriptException}.
-         *
-         * @param message the detail message
-         */
-        public ScriptEx(String message) {
-            super(message);
-        }
-
-        /**
-         * Constructor for {@code ScriptException}.
-         *
-         * @param message the detail message
-         * @param cause the root cause
-         */
-        public ScriptEx(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 
     /**
      * Read a script from the provided {@code LineNumberReader}, using the

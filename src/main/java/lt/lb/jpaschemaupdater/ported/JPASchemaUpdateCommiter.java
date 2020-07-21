@@ -1,36 +1,42 @@
 package lt.lb.jpaschemaupdater.ported;
 
+import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
  *
- * @author Laimonas-Beniusis-PC
+ * @author laim0nas100
  */
 public interface JPASchemaUpdateCommiter {
 
-
     public JPASchemaVersionResolver getJPASchemaResolver();
-    
+
     /**
      * Establish transactions and do the updates
      *
      * @param instance
      */
-    public default void doUpdate(JPASchemaUpdateInstance instance) {
+    public default void doUpdate(JPASchemaUpdateInstance instance) throws Exception {
 
-        ManagedAccess ma = instance.createManagedAccess();
-        
-        ma.beginTransaction();
-        for(JPASchemaUpdateStategy strategy:instance.getUpdates()){
-            strategy.doUpdate(ma);
+        ManagedAccessFactory managedAccessFactory = instance.getManagedAccessFactory();
+        try (ManagedAccess ma = managedAccessFactory.create()) {
+            try {
+                ma.beginTransaction();
+                for (JPASchemaUpdateStategy strategy : instance.getUpdates()) {
+                    strategy.doUpdate(ma);
+                }
+                ma.commit();
+            } catch (Exception ex) {
+                ma.rollback();
+                throw new JPASchemaUpdateException(ex);
+            }
+
         }
-        ma.commit();
-        ma.close();
     }
 
-    public default void updateSchema(List<JPASchemaUpdateInstance> updates) {
+    public default void updateSchema(List<JPASchemaUpdateInstance> updates) throws Exception {
         Collections.sort(updates, Comparator.comparing(t -> t.getVersion()));
         JPASchemaVersionResolver resolver = getJPASchemaResolver();
         long currentVer = resolver.getCurrentVersion();
@@ -43,6 +49,5 @@ public interface JPASchemaUpdateCommiter {
             }
         }
     }
-    
 
 }

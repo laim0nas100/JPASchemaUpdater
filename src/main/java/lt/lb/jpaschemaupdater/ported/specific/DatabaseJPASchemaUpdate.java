@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
-import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateException;
+import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
 import lt.lb.jpaschemaupdater.ported.JPASchemaVersionResolver;
 
 /**

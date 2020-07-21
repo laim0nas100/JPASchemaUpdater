@@ -10,10 +10,26 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstance;
  */
 public class JPASchemaUpdateInvoker {
 
-    private JPASchemaUpdateCommiter commiter;
-    private List<JPASchemaUpdateInstance> updates;
+    protected JPASchemaUpdateCommiter commiter;
+    protected List<JPASchemaUpdateInstance> updates;
+
+    public JPASchemaUpdateCommiter getCommiter() {
+        return commiter;
+    }
+
+    public void setCommiter(JPASchemaUpdateCommiter commiter) {
+        this.commiter = commiter;
+    }
+
+    public List<JPASchemaUpdateInstance> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(List<JPASchemaUpdateInstance> updates) {
+        this.updates = updates;
+    }
     
-    public void invokeUpdate() {
+    public void invokeUpdate() throws Exception {
         commiter.updateSchema(updates);
     }
 }

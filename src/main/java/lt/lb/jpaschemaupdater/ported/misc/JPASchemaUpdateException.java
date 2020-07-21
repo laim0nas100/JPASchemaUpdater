@@ -1,4 +1,4 @@
-package lt.lb.jpaschemaupdater.ported;
+package lt.lb.jpaschemaupdater.ported.misc;
 
 /**
  *

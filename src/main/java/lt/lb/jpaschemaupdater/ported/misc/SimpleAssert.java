@@ -1,9 +1,7 @@
-package lt.lb.jpaschemaupdater.ported;
+package lt.lb.jpaschemaupdater.ported.misc;
 
 import java.util.Objects;
-import lt.lb.commons.Log;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.jpa.HibernatePersistenceProvider;
 
 
 /**

@@ -13,7 +13,7 @@ public interface JPASchemaUpdateInstance {
     
     public Long getVersion();
     
-    public ManagedAccess createManagedAccess();
+    public ManagedAccessFactory getManagedAccessFactory();
     
     public List<JPASchemaUpdateStategy> getUpdates();
     
