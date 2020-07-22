@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
+import org.apache.commons.logging.Log;
 
 /**
  *
@@ -20,8 +21,8 @@ public interface StrictJPASchemaUpdateCommiter extends JPASchemaUpdateCommiter {
     public default long finalVersion() {
         return -1;
     }
-    
-    public default boolean needsUpdate(){
+
+    public default boolean needsUpdate() {
         long currentVer = getJPASchemaResolver().getCurrentVersion();
         long finalVersion = finalVersion();
         if (finalVersion > 0 && finalVersion <= currentVer) {
@@ -36,15 +37,22 @@ public interface StrictJPASchemaUpdateCommiter extends JPASchemaUpdateCommiter {
         JPASchemaVersionResolver resolver = getJPASchemaResolver();
         long currentVer = resolver.getCurrentVersion();
         long finalVersion = finalVersion();
-        if (!needsUpdate()){
-            getLog().info("No updates needed, current version:" + currentVer + " final version:" + finalVersion);
+        Log log = getLog();
+        if (!needsUpdate()) {
+            if (log.isInfoEnabled()) {
+                log.info("No updates needed, current version:" + currentVer + " final version:" + finalVersion);
+            }
+
             return;
         }
         Collections.sort(updates, Comparator.comparing(t -> t.getVersion()));
         for (JPASchemaUpdateInstance update : updates) {
             long newVer = update.getVersion();
             if (finalVersion > 0 && finalVersion < newVer) {
-                getLog().info("No more updates needed, current version:" + currentVer + " final version:" + finalVersion);
+                if (log.isInfoEnabled()) {
+                    log.info("No more updates needed, current version:" + currentVer + " final version:" + finalVersion);
+                }
+
                 return;
             }
             if (newVer > currentVer) {
