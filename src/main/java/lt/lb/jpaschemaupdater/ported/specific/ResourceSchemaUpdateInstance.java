@@ -10,6 +10,8 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateStategy.ConnectionSchemaUpda
 import lt.lb.jpaschemaupdater.ported.misc.ResourceReadingUtils;
 import lt.lb.jpaschemaupdater.ported.ManagedAccessFactory;
 import lt.lb.jpaschemaupdater.ported.misc.Scripting.ScriptReadOptions;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -26,9 +28,18 @@ public class ResourceSchemaUpdateInstance<T extends BaseSchemaUpdateInstance<Res
     }
 
     public ResourceSchemaUpdateInstance(URL resource, ScriptReadOptions opt, ManagedAccessFactory managedAccessFactory) throws URISyntaxException {
-        super(ResourceReadingUtils.getVersionFromFileName(resource), managedAccessFactory);
+        super(getVersionFromFileName(resource),
+                managedAccessFactory);
         this.resource = resource;
         this.opt = opt;
+    }
+
+    public static Long getVersionFromFileName(URL url) throws URISyntaxException {
+        return ResourceReadingUtils.getFilePath(url)
+                .map(FilenameUtils::getName)
+                .map(FilenameUtils::removeExtension)
+                .map(StringUtils::getDigits)
+                .map(Long::parseLong).get();
     }
 
     public URL getResource() {
@@ -37,7 +48,7 @@ public class ResourceSchemaUpdateInstance<T extends BaseSchemaUpdateInstance<Res
 
     public void setResource(URL resource) throws URISyntaxException {
         this.resource = resource;
-        setVersion(ResourceReadingUtils.getVersionFromFileName(resource));
+        setVersion(getVersionFromFileName(resource));
         this.updates = null;
     }
 
@@ -85,7 +96,5 @@ public class ResourceSchemaUpdateInstance<T extends BaseSchemaUpdateInstance<Res
     public void setIgnoreFailedDrops(boolean ignoreFailedDrops) {
         this.ignoreFailedDrops = ignoreFailedDrops;
     }
-    
-    
 
 }

@@ -8,7 +8,7 @@ import lt.lb.jpaschemaupdater.ported.ManagedAccessFactory;
  *
  * @author laim0nas100
  */
-public class EMFManagedAccessFactory implements ManagedAccessFactory{
+public class EMFManagedAccessFactory implements ManagedAccessFactory {
 
     private EntityManagerFactory entityManagerFactory;
 
@@ -18,10 +18,10 @@ public class EMFManagedAccessFactory implements ManagedAccessFactory{
     public EMFManagedAccessFactory(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
-    
+
     @Override
     public ManagedAccess create() throws Exception {
         return new ManagedAccess.EmProvider(entityManagerFactory.createEntityManager());
     }
-    
+
 }

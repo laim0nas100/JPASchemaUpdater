@@ -18,16 +18,17 @@ public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolve
     protected DataSource source;
     protected String versionSelectQuery;
     protected String versionUpdatePreparedStatement;
-    
-    public DatabaseJPASchemaVersionResolver(){
-        
+
+    public DatabaseJPASchemaVersionResolver() {
+
     }
 
     /**
-     * 
+     *
      * @param source DataSource
      * @param versionSelectQuery query that returns single result Long
-     * @param versionUpdatePreparedStatement prepared statement query that accepts 1 Long parameter
+     * @param versionUpdatePreparedStatement prepared statement query that
+     * accepts 1 Long parameter
      */
     public DatabaseJPASchemaVersionResolver(DataSource source, String versionSelectQuery, String versionUpdatePreparedStatement) {
         this.source = source;
@@ -58,8 +59,6 @@ public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolve
     public void setVersionUpdatePreparedStatement(String versionUpdatePreparedStatement) {
         this.versionUpdatePreparedStatement = versionUpdatePreparedStatement;
     }
-
-     
 
     @Override
     public Long getCurrentVersion() {

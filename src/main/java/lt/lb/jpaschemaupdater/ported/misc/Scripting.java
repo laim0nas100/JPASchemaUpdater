@@ -1,7 +1,10 @@
 package lt.lb.jpaschemaupdater.ported.misc;
 
+import com.sun.tools.doclets.standard.Standard;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -10,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notBlank;
 import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notEmpty;
+import static lt.lb.jpaschemaupdater.ported.misc.SimpleAssert.notNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,62 +21,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  *
  * Copied relevant functions from Spring's ScriptUtils
+ *
  * @author laim0nas100
  */
 public class Scripting {
 
     private static final Log logger = LogFactory.getLog(Scripting.class);
-
-    /**
-     * Read a script from the provided {@code LineNumberReader}, using the
-     * supplied comment prefix and statement separator, and build a
-     * {@code String} containing the lines.
-     * <p>
-     * Lines <em>beginning</em> with the comment prefix are excluded from the
-     * results; however, line comments anywhere else &mdash; for example, within
-     * a statement &mdash; will be included in the results.
-     *
-     * @param lineNumberReader the {@code LineNumberReader} containing the
-     * script to be processed
-     * @param commentPrefix the prefix that identifies comments in the SQL
-     * script &mdash; typically "--"
-     * @param separator the statement separator in the SQL script &mdash;
-     * typically ";"
-     * @return a {@code String} containing the script lines
-     * @throws IOException in case of I/O errors
-     */
-    public static String readScript(LineNumberReader lineNumberReader, String commentPrefix, String separator)
-            throws IOException {
-
-        String currentStatement = lineNumberReader.readLine();
-        StringBuilder scriptBuilder = new StringBuilder();
-        while (currentStatement != null) {
-            if (commentPrefix != null && !currentStatement.startsWith(commentPrefix)) {
-                if (scriptBuilder.length() > 0) {
-                    scriptBuilder.append('\n');
-                }
-                scriptBuilder.append(currentStatement);
-            }
-            currentStatement = lineNumberReader.readLine();
-        }
-        appendSeparatorToScriptIfNecessary(scriptBuilder, separator);
-        return scriptBuilder.toString();
-    }
-
-    private static void appendSeparatorToScriptIfNecessary(StringBuilder scriptBuilder, String separator) {
-        if (separator == null) {
-            return;
-        }
-        String trimmed = separator.trim();
-        if (trimmed.length() == separator.length()) {
-            return;
-        }
-        // separator ends in whitespace, so we might want to see if the script is trying
-        // to end the same way
-        if (scriptBuilder.lastIndexOf(trimmed) == scriptBuilder.length() - trimmed.length()) {
-            scriptBuilder.append(separator.substring(trimmed.length()));
-        }
-    }
 
     /**
      * Does the provided SQL script contain the specified delimiter?
@@ -185,23 +139,41 @@ public class Scripting {
 
     public static class ScriptReadOptions {
 
-        public static final ScriptReadOptions DEFAULT = new ScriptReadOptions("--", ";", "/*", "*/", "^^^ END OF SCRIPT ^^^", "\n");
+        public static final ScriptReadOptions DEFAULT = new ScriptReadOptions(StandardCharsets.UTF_8, "--", ";", "/*", "*/", "^^^ END OF SCRIPT ^^^", "\n");
 
+        /**
+         * Comment prefix, generally "--" in sql scripts
+         */
         public final String commentPrefix;
+
+        /**
+         * Script separator, that indicates separate command
+         */
         public final String separator;
+        /**
+         * Block comment start delimiter cannot be empty or white space
+         */
         public final String blockCommentStartDelimiter;
+
+        /**
+         * Block comment start delimiter cannot be empty or white space
+         */
         public final String blockCommentEndDelimiter;
+
         public final String eofStatementSeparator;
         public final String fallbackStatementSeparator;
 
-        public ScriptReadOptions check(String script) {
+        public final Charset charset;
+
+        ScriptReadOptions check(String script) {
             if (!eofStatementSeparator.equals(separator) && !containsSqlScriptDelimiters(script, separator)) {
                 return this.withSeparator(fallbackStatementSeparator);
             }
             return this;
         }
 
-        public ScriptReadOptions(String commentPrefix, String separator, String blockCommentStartDelimiter, String blockCommentEndDelimiter, String eofStatementSeparator, String fallbackStatementSeparator) {
+        public ScriptReadOptions(Charset charset, String commentPrefix, String separator, String blockCommentStartDelimiter, String blockCommentEndDelimiter, String eofStatementSeparator, String fallbackStatementSeparator) {
+            this.charset = notNull(charset);
             this.commentPrefix = notBlank(commentPrefix);
             this.separator = notEmpty(separator);
             this.blockCommentStartDelimiter = notBlank(blockCommentStartDelimiter);
@@ -212,19 +184,23 @@ public class Scripting {
         }
 
         public ScriptReadOptions withSeparator(String sep) {
-            return new ScriptReadOptions(commentPrefix, sep, blockCommentStartDelimiter, blockCommentEndDelimiter, eofStatementSeparator, fallbackStatementSeparator);
+            return new ScriptReadOptions(charset, commentPrefix, sep, blockCommentStartDelimiter, blockCommentEndDelimiter, eofStatementSeparator, fallbackStatementSeparator);
         }
 
         public ScriptReadOptions withCommentPrefix(String prefix) {
-            return new ScriptReadOptions(prefix, separator, blockCommentStartDelimiter, blockCommentEndDelimiter, eofStatementSeparator, fallbackStatementSeparator);
+            return new ScriptReadOptions(charset, prefix, separator, blockCommentStartDelimiter, blockCommentEndDelimiter, eofStatementSeparator, fallbackStatementSeparator);
         }
 
         public ScriptReadOptions withBlockComment(String start, String end) {
-            return new ScriptReadOptions(commentPrefix, separator, start, end, eofStatementSeparator, fallbackStatementSeparator);
+            return new ScriptReadOptions(charset, commentPrefix, separator, start, end, eofStatementSeparator, fallbackStatementSeparator);
         }
 
         public ScriptReadOptions withEofAndFallback(String eof, String fallback) {
-            return new ScriptReadOptions(commentPrefix, separator, blockCommentStartDelimiter, blockCommentEndDelimiter, eof, fallback);
+            return new ScriptReadOptions(charset, commentPrefix, separator, blockCommentStartDelimiter, blockCommentEndDelimiter, eof, fallback);
+        }
+
+        public ScriptReadOptions withCharset(Charset charset) {
+            return new ScriptReadOptions(charset, commentPrefix, separator, blockCommentStartDelimiter, blockCommentEndDelimiter, eofStatementSeparator, fallbackStatementSeparator);
         }
 
         public ScriptReadOptions getDefault() {
@@ -255,12 +231,6 @@ public class Scripting {
      * specifically an error on a {@code DROP} statement
      * @param opt
      * @throws ScriptEx if an error occurred while executing the SQL script
-     * @see #DEFAULT_STATEMENT_SEPARATOR
-     * @see #FALLBACK_STATEMENT_SEPARATOR
-     * @see #EOF_STATEMENT_SEPARATOR
-     * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
-     * @see
-     * org.springframework.jdbc.datasource.DataSourceUtils#releaseConnection
      */
     public static void executeSqlScript(Connection connection, String script, boolean continueOnError,
             boolean ignoreFailedDrops, ScriptReadOptions opt) throws ScriptEx {

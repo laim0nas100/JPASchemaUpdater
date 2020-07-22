@@ -32,6 +32,5 @@ public class DataSourceManagedAccessFactory implements ManagedAccessFactory {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    
 
 }

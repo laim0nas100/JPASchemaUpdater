@@ -4,6 +4,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstance;
@@ -12,6 +13,7 @@ import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
 import lt.lb.jpaschemaupdater.ported.misc.ResourceReadingUtils;
 import lt.lb.jpaschemaupdater.ported.misc.Scripting.ScriptReadOptions;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstanceMaker;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -25,18 +27,17 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
     protected ManagedAccessFactory managedAccessFactory;
     protected boolean continueOnError = false;
     protected boolean ignoreFailedDrops = false;
-    protected List<ScriptOptionsByFilePattern> regexPatterns = new ArrayList<>();
+    protected List<ScriptOptionsByPattern> patterns = new ArrayList<>();
 
-    public static class ScriptOptionsByFilePattern {
+    public static class ScriptOptionsByPattern {
 
         protected ScriptReadOptions scriptReadOptions;
-        protected String pattern;
-        private Pattern compiled;
+        protected Predicate<URL> pattern;
 
-        public ScriptOptionsByFilePattern() {
+        public ScriptOptionsByPattern() {
         }
 
-        public ScriptOptionsByFilePattern(ScriptReadOptions scriptReadOptions, String pattern) {
+        public ScriptOptionsByPattern(ScriptReadOptions scriptReadOptions, Predicate<URL> pattern) {
             this.scriptReadOptions = scriptReadOptions;
             this.pattern = pattern;
         }
@@ -49,20 +50,12 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
             this.scriptReadOptions = scriptReadOptions;
         }
 
-        public String getPattern() {
+        public Predicate<URL> getPattern() {
             return pattern;
         }
 
-        public void setPattern(String pattern) {
+        public void setPattern(Predicate<URL> pattern) {
             this.pattern = pattern;
-            this.compiled = null;
-        }
-
-        public Pattern getCompiledPattern() {
-            if (compiled == null) {
-                compiled = Pattern.compile(pattern);
-            }
-            return compiled;
         }
 
     }
@@ -76,19 +69,45 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
         this.managedAccessFactory = managedAccessFactory;
     }
 
-
     public T addResource(URL res) {
         resourceFiles.add(res);
         return (T) this;
     }
-    
-    public T addPattern(ScriptOptionsByFilePattern pat){
-        this.regexPatterns.add(pat);
+
+    public T addPattern(ScriptOptionsByPattern pat) {
+        this.patterns.add(pat);
         return (T) this;
     }
-    
-    public T addPattern(String str, ScriptReadOptions opt){
-        this.regexPatterns.add(new ScriptOptionsByFilePattern(opt, str));
+
+    public T addFilenamePattern(String str, ScriptReadOptions opt) {
+        final Predicate<String> pattern = Pattern.compile(str).asPredicate();
+        Predicate<URL> pred = (url) -> {
+            try {
+                return ResourceReadingUtils.getFilePath(url)
+                        .map(FilenameUtils::getName)
+                        .map(FilenameUtils::removeExtension)
+                        .filter(pattern).isPresent();
+            } catch (Exception ex) {
+                throw new JPASchemaUpdateException(ex);
+            }
+        };
+
+        this.patterns.add(new ScriptOptionsByPattern(opt, pred));
+        return (T) this;
+    }
+
+    public T addFilePathPattern(String str, ScriptReadOptions opt) {
+        final Predicate<String> pattern = Pattern.compile(str).asPredicate();
+        Predicate<URL> pred = (url) -> {
+            try {
+                return ResourceReadingUtils.getFilePath(url)
+                        .filter(pattern).isPresent();
+            } catch (Exception ex) {
+                throw new JPASchemaUpdateException(ex);
+            }
+        };
+
+        this.patterns.add(new ScriptOptionsByPattern(opt, pred));
         return (T) this;
     }
 
@@ -102,14 +121,13 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
 
     protected JPASchemaUpdateInstance generateInstance(URL url) {
         try {
-            String fileNameNoExt = ResourceReadingUtils.getFileNameNoExt(url);
-            ScriptReadOptions options = getRegexPatterns().stream().filter(p -> {
-                return p.getCompiledPattern().asPredicate().test(fileNameNoExt);
-            }).map(m -> m.getScriptReadOptions()).findFirst().orElse(getDefaultOptions());
+            ScriptReadOptions options = getPatterns().stream().filter(f -> f.getPattern().test(url))
+                    .map(m -> m.getScriptReadOptions()).findFirst().orElse(getDefaultOptions());
+
             ResourceSchemaUpdateInstance instance = new ResourceSchemaUpdateInstance(url, options, getManagedAccessFactory());
             instance.setContinueOnError(isContinueOnError());
             instance.setIgnoreFailedDrops(isIgnoreFailedDrops());
-            
+
             return instance;
         } catch (URISyntaxException ex) {
             throw new JPASchemaUpdateException(ex);
@@ -156,12 +174,12 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
         this.ignoreFailedDrops = ignoreFailedDrops;
     }
 
-    public List<ScriptOptionsByFilePattern> getRegexPatterns() {
-        return regexPatterns;
+    public List<ScriptOptionsByPattern> getPatterns() {
+        return patterns;
     }
 
-    public void setRegexPatterns(List<ScriptOptionsByFilePattern> regexPatterns) {
-        this.regexPatterns = regexPatterns;
+    public void setPatterns(List<ScriptOptionsByPattern> patterns) {
+        this.patterns = patterns;
     }
 
 }

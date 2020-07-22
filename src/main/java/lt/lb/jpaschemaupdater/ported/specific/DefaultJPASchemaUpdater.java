@@ -6,9 +6,9 @@ import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstanceMaker;
 
 /**
  *
- * @author Laimonas-Beniusis-PC
+ * @author laim0nas100
  */
-public class DefaultJPASchemaUpdater implements JPASchemaUpdater{
+public class DefaultJPASchemaUpdater implements JPASchemaUpdater {
 
     protected JPASchemaUpdateInstanceMaker instanceMaker;
     protected JPASchemaUpdateCommiter updateCommiter;
@@ -20,8 +20,7 @@ public class DefaultJPASchemaUpdater implements JPASchemaUpdater{
         this.instanceMaker = instanceMaker;
         this.updateCommiter = updateCommiter;
     }
-    
-    
+
     @Override
     public JPASchemaUpdateInstanceMaker getInstanceMaker() {
         return instanceMaker;
@@ -39,6 +38,5 @@ public class DefaultJPASchemaUpdater implements JPASchemaUpdater{
     public void setUpdateCommiter(JPASchemaUpdateCommiter updateCommiter) {
         this.updateCommiter = updateCommiter;
     }
-    
-    
+
 }

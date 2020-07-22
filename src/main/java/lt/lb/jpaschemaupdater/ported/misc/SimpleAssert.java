@@ -3,17 +3,16 @@ package lt.lb.jpaschemaupdater.ported.misc;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  *
  * @author Lemmin
  */
 public class SimpleAssert {
-    
-    public static <T> T notNull(T object){
+
+    public static <T> T notNull(T object) {
         return Objects.requireNonNull(object);
     }
-    
+
     public static String notEmpty(String str) {
         not(str, StringUtils::isAllEmpty, "Has to be not empty");
         return str;
@@ -52,5 +51,5 @@ public class SimpleAssert {
         }
 
     }
-    
+
 }

@@ -1,19 +1,18 @@
 package lt.lb.jpaschemaupdater.ported.misc;
 
-import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateStategy.ConnectionSchemaUpdateStrategy;
 import lt.lb.jpaschemaupdater.ported.misc.Scripting.ScriptReadOptions;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -25,7 +24,8 @@ public class ResourceReadingUtils {
             URL resourceScript,
             boolean continueOnError,
             boolean ignoreFailedDrops, ScriptReadOptions opt) throws IOException, URISyntaxException {
-        String scripts = Resources.toString(resourceScript, StandardCharsets.UTF_8);
+        
+        String scripts = IOUtils.toString(resourceScript, StandardCharsets.UTF_8);
 
         LinkedList<String> statements = new LinkedList<>();
         Scripting.splitSqlScript(scripts, opt, statements);
@@ -38,14 +38,8 @@ public class ResourceReadingUtils {
 
     }
 
-    public static Long getVersionFromFileName(URL resource) throws URISyntaxException {
-        String path = getFileNameNoExt(resource);
-        String digits = StringUtils.getDigits(path);
-        return Long.parseLong(digits);
+    public static Optional<String> getFilePath(URL resource) throws URISyntaxException {
+        return Optional.of(FilenameUtils.getFullPathNoEndSeparator(resource.getFile()));
     }
 
-    public static String getFileNameNoExt(URL resource) throws URISyntaxException {
-        String name = FilenameUtils.getName(resource.getFile());
-        return FilenameUtils.removeExtension(name);
-    }
 }

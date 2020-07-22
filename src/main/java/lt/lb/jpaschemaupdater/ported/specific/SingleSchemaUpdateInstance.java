@@ -17,6 +17,13 @@ public interface SingleSchemaUpdateInstance extends JPASchemaUpdateInstance {
         return Arrays.asList(a -> executeStrategy(a));
     }
 
+    @Override
+    public default Long getVersion() {
+        return version();
+    }
+
+    public long version();
+
     public void executeStrategy(ManagedAccess ma);
 
 }

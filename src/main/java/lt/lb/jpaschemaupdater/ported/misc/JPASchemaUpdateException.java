@@ -4,7 +4,7 @@ package lt.lb.jpaschemaupdater.ported.misc;
  *
  * @author laim0nas100
  */
-public class JPASchemaUpdateException extends RuntimeException{
+public class JPASchemaUpdateException extends RuntimeException {
 
     public JPASchemaUpdateException(String message) {
         super(message);
@@ -17,5 +17,5 @@ public class JPASchemaUpdateException extends RuntimeException{
     public JPASchemaUpdateException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
 }

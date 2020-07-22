@@ -23,8 +23,6 @@ public class EMFConnectionFactory implements ManagedAccessFactory {
     public EMFConnectionFactory() {
     }
 
-    
-    
     @Override
     public ManagedAccess create() throws Exception {
 
@@ -49,7 +47,5 @@ public class EMFConnectionFactory implements ManagedAccessFactory {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    
-    
 
 }

@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 /**
  *
  * Singular update unit.
+ *
  * @author laim0nas100
  */
 public interface JPASchemaUpdateStategy {
@@ -16,7 +17,7 @@ public interface JPASchemaUpdateStategy {
      *
      * @param conn
      */
-    public void doUpdate(ManagedAccess conn) ;
+    public void doUpdate(ManagedAccess conn);
 
     /**
      * Update strategy with provided entity manager

@@ -148,8 +148,6 @@ public interface ManagedAccess extends AutoCloseable {
             }
             transaction.commit();
             transaction = null;
-            em.flush();
-
         }
 
         @Override

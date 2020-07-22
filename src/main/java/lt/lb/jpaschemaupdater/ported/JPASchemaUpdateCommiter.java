@@ -22,13 +22,18 @@ public interface JPASchemaUpdateCommiter {
     public default void doUpdate(JPASchemaUpdateInstance instance) throws Exception {
 
         ManagedAccessFactory managedAccessFactory = instance.getManagedAccessFactory();
-        try ( ManagedAccess ma = managedAccessFactory.create()) {
+        try (ManagedAccess ma = managedAccessFactory.create()) {
             try {
                 ma.beginTransaction();
                 inTransaction(instance, ma);
                 ma.commit();
             } catch (Exception ex) {
-                ma.rollback();
+                try {
+                    ma.rollback();
+                } catch (Exception rollEx) {
+
+                }
+
                 throw new JPASchemaUpdateException(ex);
             }
 

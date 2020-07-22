@@ -28,7 +28,7 @@ public class JPASchemaUpdateInvoker {
     public void setUpdates(List<JPASchemaUpdateInstance> updates) {
         this.updates = updates;
     }
-    
+
     public void invokeUpdate() throws Exception {
         commiter.updateSchema(updates);
     }

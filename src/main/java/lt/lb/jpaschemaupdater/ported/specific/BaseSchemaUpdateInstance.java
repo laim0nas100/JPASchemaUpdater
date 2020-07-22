@@ -16,7 +16,7 @@ public class BaseSchemaUpdateInstance<T extends BaseSchemaUpdateInstance> implem
 
     protected Long version;
     protected ManagedAccessFactory managedAccessFactory;
-    protected List<JPASchemaUpdateStategy> updates = new ArrayList<>();
+    protected List<JPASchemaUpdateStategy> updates;
 
     public BaseSchemaUpdateInstance() {
 
@@ -37,15 +37,18 @@ public class BaseSchemaUpdateInstance<T extends BaseSchemaUpdateInstance> implem
     }
 
     public T addStrategy(JPASchemaUpdateStategy strategy) {
+        if (updates == null) {
+            updates = new ArrayList<>();
+        }
         updates.add(strategy);
         return (T) this;
     }
-    
-    public T addConnectionStrategy(ConnectionSchemaUpdateStrategy strategy){
+
+    public T addConnectionStrategy(ConnectionSchemaUpdateStrategy strategy) {
         return addStrategy(strategy);
     }
-    
-    public T addEMStrategy(EMSchemaUpdateStrategy strategy){
+
+    public T addEMStrategy(EMSchemaUpdateStrategy strategy) {
         return addStrategy(strategy);
     }
 
@@ -59,7 +62,6 @@ public class BaseSchemaUpdateInstance<T extends BaseSchemaUpdateInstance> implem
         return updates;
     }
 
-
     public void setUpdates(List<JPASchemaUpdateStategy> updates) {
         this.updates = updates;
     }
@@ -67,7 +69,5 @@ public class BaseSchemaUpdateInstance<T extends BaseSchemaUpdateInstance> implem
     public void setManagedAccessFactory(ManagedAccessFactory managedAccessFactory) {
         this.managedAccessFactory = managedAccessFactory;
     }
-    
-    
 
 }
