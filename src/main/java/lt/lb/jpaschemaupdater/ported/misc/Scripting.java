@@ -1,8 +1,5 @@
 package lt.lb.jpaschemaupdater.ported.misc;
 
-import com.sun.tools.doclets.standard.Standard;
-import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -237,8 +234,6 @@ public class Scripting {
 
         notBlank(script);
         try {
-            long startTime = System.currentTimeMillis();
-
             opt = opt.check(script);
             List<String> statements = new LinkedList<>();
             splitSqlScript(script, opt, statements);
@@ -280,10 +275,6 @@ public class Scripting {
                 }
             }
 
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            if (logger.isInfoEnabled()) {
-                logger.info("Executed SQL script in " + elapsedTime + " ms.");
-            }
         } catch (Exception ex) {
             if (ex instanceof ScriptEx) {
                 throw (ScriptEx) ex;

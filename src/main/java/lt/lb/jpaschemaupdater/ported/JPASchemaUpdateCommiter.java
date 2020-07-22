@@ -12,8 +12,8 @@ import org.apache.commons.logging.LogFactory;
  * @author laim0nas100
  */
 public interface JPASchemaUpdateCommiter {
-    
-    public default Log getLog(){
+
+    public default Log getLog() {
         return LogFactory.getLog(this.getClass());
     }
 
@@ -45,23 +45,35 @@ public interface JPASchemaUpdateCommiter {
         }
     }
 
-    
-    
     public default void inTransaction(JPASchemaUpdateInstance instance, ManagedAccess ma) {
 
         List<JPASchemaUpdateStategy> updates = instance.getUpdates();
         Long version = instance.getVersion();
-        getLog().info("Starting schema update version " + version);
+        Log logger = getLog();
+        if (logger.isInfoEnabled()) {
+            logger.info("Starting schema update version " + version);
+        }
+
         int i = 1;
         int size = updates.size();
         for (JPASchemaUpdateStategy strategy : updates) {
-            getLog().info("Using strategy nr. " + i + " of " + size);
+            if(logger.isInfoEnabled()){
+                logger.info("Using strategy nr. " + i + " of " + size);
+            }
+            
+            long startTime = System.currentTimeMillis();
             strategy.doUpdate(ma);
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            if (logger.isInfoEnabled()) {
+                logger.info("Executed update strategy in " + elapsedTime + " ms.");
+            }
             i++;
         }
-        getLog().info("Done with schema update version " + version);
+        if(logger.isInfoEnabled()){
+            logger.info("Done with schema update version " + version);
+        }
+        
     }
-
 
     public default void updateSchema(List<JPASchemaUpdateInstance> updates) throws Exception {
         Collections.sort(updates, Comparator.comparing(t -> t.getVersion()));

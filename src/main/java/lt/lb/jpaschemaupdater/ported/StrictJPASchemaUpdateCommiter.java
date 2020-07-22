@@ -3,9 +3,6 @@ package lt.lb.jpaschemaupdater.ported;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateCommiter;
-import lt.lb.jpaschemaupdater.ported.JPASchemaUpdateInstance;
-import lt.lb.jpaschemaupdater.ported.JPASchemaVersionResolver;
 import lt.lb.jpaschemaupdater.ported.misc.JPASchemaUpdateException;
 
 /**
