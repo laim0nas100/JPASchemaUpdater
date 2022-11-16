@@ -79,7 +79,9 @@ public interface ManagedAccess extends AutoCloseable {
         @Override
         public void commit() {
             try {
-                conn.commit();
+                if (!conn.getAutoCommit()) {
+                    conn.commit();
+                }
             } catch (Exception ex) {
                 throw new ConnEx(ex);
             }
