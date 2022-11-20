@@ -13,7 +13,7 @@ import lt.lb.jpaschemaupdater.misc.Scripting;
  *
  * @author laim0nas100
  */
-public class ResourceSchemaUpdateInstance<Ver> extends BaseSchemaUpdateInstance<Ver> {
+public abstract class ResourceSchemaUpdateInstance<Ver, M extends ResourceSchemaUpdateInstance<Ver, M>> extends BaseSchemaUpdateInstance<Ver, M> {
 
     protected URL resource;
     protected Scripting.ScriptReadOptions opt;
@@ -24,7 +24,7 @@ public class ResourceSchemaUpdateInstance<Ver> extends BaseSchemaUpdateInstance<
     }
 
     public ResourceSchemaUpdateInstance(Ver version, URL resource, Scripting.ScriptReadOptions opt, ManagedAccessFactory managedAccessFactory) {
-        super(version,managedAccessFactory);
+        super(version, managedAccessFactory);
         this.resource = resource;
         this.opt = opt;
     }
@@ -52,21 +52,6 @@ public class ResourceSchemaUpdateInstance<Ver> extends BaseSchemaUpdateInstance<
             }
         }
         return updates;
-    }
-
-    @Override
-    public ResourceSchemaUpdateInstance<Ver> addEMStrategy(JPASchemaUpdateStategy.EMSchemaUpdateStrategy strategy) {
-        return (ResourceSchemaUpdateInstance<Ver>) super.addEMStrategy(strategy);
-    }
-
-    @Override
-    public ResourceSchemaUpdateInstance<Ver> addConnectionStrategy(JPASchemaUpdateStategy.ConnectionSchemaUpdateStrategy strategy) {
-        return (ResourceSchemaUpdateInstance<Ver>) super.addConnectionStrategy(strategy);
-    }
-
-    @Override
-    public ResourceSchemaUpdateInstance<Ver> addStrategy(JPASchemaUpdateStategy strategy) {
-        return (ResourceSchemaUpdateInstance<Ver>) super.addStrategy(strategy);
     }
 
     @Override

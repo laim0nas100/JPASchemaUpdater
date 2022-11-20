@@ -6,6 +6,7 @@ import lt.lb.jpaschemaupdater.JPASchemaVersionResolver;
 /**
  *
  * @author laim0nas100
+ * @param <Ver>
  */
 public class DefaultJPASchemaUpdateCommiter<Ver> implements JPASchemaUpdateCommiter<Ver> {
 

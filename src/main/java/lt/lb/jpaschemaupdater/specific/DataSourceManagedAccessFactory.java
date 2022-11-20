@@ -15,7 +15,7 @@ public class DataSourceManagedAccessFactory implements ManagedAccessFactory {
 
     @Override
     public ManagedAccess create() throws Exception {
-        return new ConnProvider(dataSource.getConnection());
+        return new ConnProvider(ManagedAccessFactory.unchecked(dataSource::getConnection), false);
     }
 
     public DataSourceManagedAccessFactory(DataSource ds) {

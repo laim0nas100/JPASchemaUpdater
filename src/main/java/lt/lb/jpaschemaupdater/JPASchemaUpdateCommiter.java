@@ -2,7 +2,6 @@ package lt.lb.jpaschemaupdater;
 
 import lt.lb.jpaschemaupdater.misc.JPASchemaUpdateException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  *
  * @author laim0nas100
+ * @param <Ver>
  */
 public interface JPASchemaUpdateCommiter<Ver> {
 
@@ -27,7 +27,7 @@ public interface JPASchemaUpdateCommiter<Ver> {
      */
     public default void doUpdate(JPASchemaUpdateInstance<Ver> instance) throws Exception {
         ManagedAccessFactory managedAccessFactory = instance.getManagedAccessFactory();
-        try (ManagedAccess ma = managedAccessFactory.create()) {
+        try (ManagedAccess ma = managedAccessFactory.create()) { // autoclose
             try {
                 ma.beginTransaction();
                 inTransaction(instance, ma);
@@ -77,13 +77,11 @@ public interface JPASchemaUpdateCommiter<Ver> {
 
     public default void updateSchema(List<JPASchemaUpdateInstance<Ver>> updates) throws Exception {
         JPASchemaVersionResolver<Ver> resolver = getJPASchemaVersionResolver();
-        Comparator<Ver> cmp = resolver.getVersionComparator();
-        Collections.sort(updates, Comparator.comparing(t -> t.getVersion(), cmp));
-
+        sortUpdates(updates);
         Ver currentVer = resolver.getCurrentVersion();
         for (JPASchemaUpdateInstance<Ver> update : updates) {
             Ver newVer = update.getVersion();
-            if(cmp.compare(currentVer, newVer) <= 0){
+            if(compareVersions(currentVer, newVer) <= 0){
                 doUpdate(update);
                 resolver.setCurrentVersion(newVer);
                 currentVer = newVer;

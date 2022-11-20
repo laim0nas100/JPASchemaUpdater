@@ -1,10 +1,10 @@
 package lt.lb.jpaschemaupdater.specific;
 
-import java.util.Arrays;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import lt.lb.jpaschemaupdater.ManagedAccess;
 import lt.lb.jpaschemaupdater.ManagedAccessFactory;
+import static lt.lb.jpaschemaupdater.ManagedAccessFactory.unchecked;
 
 /**
  *
@@ -26,10 +26,10 @@ public class EMFConnectionFactory implements ManagedAccessFactory {
     @Override
     public ManagedAccess create() throws Exception {
 
-        ManagedAccess.ConnProvider connProvider = new ManagedAccess.ConnProvider(dataSource.getConnection());
-        ManagedAccess.EmProvider emProvider = new ManagedAccess.EmProvider(entityManagerFactory.createEntityManager());
+        ManagedAccess.ConnProvider connProvider = new ManagedAccess.ConnProvider(unchecked(dataSource::getConnection), true);
+        ManagedAccess.EmProvider emProvider = new ManagedAccess.EmProvider(entityManagerFactory::createEntityManager);
 
-        return new ManagedAccess.CombinedProvider(Arrays.asList(connProvider, emProvider));
+        return new ManagedAccess.CombinedLazyProvider(connProvider, emProvider);
     }
 
     public EntityManagerFactory getEntityManagerFactory() {

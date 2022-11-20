@@ -12,7 +12,7 @@ import lt.lb.jpaschemaupdater.ManagedAccessFactory;
  *
  * @author laim0nas100
  */
-public class BaseSchemaUpdateInstance<Ver> implements JPASchemaUpdateInstance<Ver> {
+public abstract class BaseSchemaUpdateInstance<Ver, M extends BaseSchemaUpdateInstance<Ver,M>> implements JPASchemaUpdateInstance<Ver> {
 
     protected Ver version;
     protected ManagedAccessFactory managedAccessFactory;
@@ -35,20 +35,23 @@ public class BaseSchemaUpdateInstance<Ver> implements JPASchemaUpdateInstance<Ve
     public void setVersion(Ver version) {
         this.version = version;
     }
+    
+    protected abstract M me();
 
-    public BaseSchemaUpdateInstance<Ver> addStrategy(JPASchemaUpdateStategy strategy) {
-        if (updates == null) {
-            updates = new ArrayList<>();
+    public M addStrategy(JPASchemaUpdateStategy strategy) {
+        M me = me();
+        if (me.updates == null) {
+            me.updates = new ArrayList<>();
         }
-        updates.add(strategy);
-        return this;
+        me.updates.add(strategy);
+        return me;
     }
 
-    public BaseSchemaUpdateInstance<Ver> addConnectionStrategy(ConnectionSchemaUpdateStrategy strategy) {
+    public M addConnectionStrategy(ConnectionSchemaUpdateStrategy strategy) {
         return addStrategy(strategy);
     }
 
-    public BaseSchemaUpdateInstance<Ver> addEMStrategy(EMSchemaUpdateStrategy strategy) {
+    public M addEMStrategy(EMSchemaUpdateStrategy strategy) {
         return addStrategy(strategy);
     }
 

@@ -5,14 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Comparator;
 import javax.sql.DataSource;
+import lt.lb.jpaschemaupdater.JPASchemaVersionResolver;
 import lt.lb.jpaschemaupdater.misc.JPASchemaUpdateException;
 
 /**
  *
  * @author laim0nas100
  */
-public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolverLong {
+public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolver<Long> {
 
     protected DataSource source;
     protected String versionSelectQuery;
@@ -103,6 +105,11 @@ public class DatabaseJPASchemaVersionResolver implements JPASchemaVersionResolve
                 }
             }
         }
+    }
+
+    @Override
+    public Comparator<Long> getVersionComparator() {
+        return Long::compare;
     }
 
 }

@@ -21,7 +21,7 @@ public class EMFManagedAccessFactory implements ManagedAccessFactory {
 
     @Override
     public ManagedAccess create() throws Exception {
-        return new ManagedAccess.EmProvider(entityManagerFactory.createEntityManager());
+        return new ManagedAccess.EmProvider(entityManagerFactory::createEntityManager);
     }
 
 }

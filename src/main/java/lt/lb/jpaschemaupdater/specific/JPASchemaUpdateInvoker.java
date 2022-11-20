@@ -7,6 +7,7 @@ import lt.lb.jpaschemaupdater.JPASchemaUpdateInstance;
 /**
  *
  * @author laim0nas100
+ * @param <Ver>
  */
 public class JPASchemaUpdateInvoker<Ver> {
 

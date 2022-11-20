@@ -7,20 +7,24 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lt.lb.jpaschemaupdater.JPASchemaUpdateInstance;
+import lt.lb.jpaschemaupdater.JPASchemaUpdateInstanceMaker;
 import lt.lb.jpaschemaupdater.ManagedAccessFactory;
 import lt.lb.jpaschemaupdater.misc.JPASchemaUpdateException;
 import lt.lb.jpaschemaupdater.misc.ResourceReadingUtils;
 import lt.lb.jpaschemaupdater.misc.Scripting.ScriptReadOptions;
+import lt.lb.jpaschemaupdater.specific.ResourceSchemaUpdateInstance;
 import org.apache.commons.io.FilenameUtils;
 
 /**
  *
  * @author laimm0nas100
+ * @param <M>
+ * @param <Ver>
  */
-public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateInstanceMaker> implements JPASchemaUpdateInstanceMakerLong {
+public abstract class ResourceSchemaUpdateInstanceMaker<Ver, M extends ResourceSchemaUpdateInstanceMaker> implements JPASchemaUpdateInstanceMaker<Ver> {
 
     protected List<URL> resourceFiles = new ArrayList<>();
-    protected List<JPASchemaUpdateInstance<Long>> instances;
+    protected List<JPASchemaUpdateInstance<Ver>> instances;
     protected ScriptReadOptions defaultOptions;
     protected ManagedAccessFactory managedAccessFactory;
     protected boolean continueOnError = false;
@@ -67,34 +71,37 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
         this.managedAccessFactory = managedAccessFactory;
     }
 
-    public T addResource(URL res) {
-        resourceFiles.add(res);
-        return (T) this;
+    protected abstract M me();
+
+    public M addResource(URL res) {
+        M me = me();
+        me.resourceFiles.add(res);
+        return me;
     }
 
-    public T addPattern(ScriptOptionsByPattern pat) {
-        this.patterns.add(pat);
-        return (T) this;
+    public M addPattern(ScriptOptionsByPattern pat) {
+        M me = me();
+        me.patterns.add(pat);
+        return me;
     }
 
-    public T addFilenamePattern(String str, ScriptReadOptions opt) {
+    public M addFilenamePattern(String str, ScriptReadOptions opt) {
         final Predicate<String> pattern = Pattern.compile(str).asPredicate();
         Predicate<URL> pred = (url) -> {
             try {
                 return ResourceReadingUtils.getFilePath(url)
                         .map(FilenameUtils::getName)
-                        .map(FilenameUtils::removeExtension)
                         .filter(pattern).isPresent();
             } catch (Exception ex) {
                 throw new JPASchemaUpdateException(ex);
             }
         };
-
-        this.patterns.add(new ScriptOptionsByPattern(opt, pred));
-        return (T) this;
+        M me = me();
+        me.patterns.add(new ScriptOptionsByPattern(opt, pred));
+        return me;
     }
 
-    public T addFilePathPattern(String str, ScriptReadOptions opt) {
+    public M addFilePathPattern(String str, ScriptReadOptions opt) {
         final Predicate<String> pattern = Pattern.compile(str).asPredicate();
         Predicate<URL> pred = (url) -> {
             try {
@@ -105,28 +112,30 @@ public class ResourceSchemaUpdateInstanceMaker<T extends ResourceSchemaUpdateIns
             }
         };
 
-        this.patterns.add(new ScriptOptionsByPattern(opt, pred));
-        return (T) this;
+        M me = me();
+        me.patterns.add(new ScriptOptionsByPattern(opt, pred));
+        return me;
     }
 
     @Override
-    public List<JPASchemaUpdateInstance<Long>> getInstances() {
+    public List<JPASchemaUpdateInstance<Ver>> getInstances() {
         if (instances == null) {
             instances = getResourceFiles().stream().map(url -> generateInstance(url)).collect(Collectors.toList());
         }
         return instances;
     }
 
-    protected JPASchemaUpdateInstanceLong generateInstance(URL url) {
+    protected JPASchemaUpdateInstance<Ver> generateInstance(URL url) {
         ScriptReadOptions options = getPatterns().stream().filter(f -> f.getPattern().test(url))
                 .map(m -> m.getScriptReadOptions()).findFirst().orElse(getDefaultOptions());
 
-        ResourceSchemaUpdateInstanceLong instance = new ResourceSchemaUpdateInstanceLong(url, options, getManagedAccessFactory());
+        ResourceSchemaUpdateInstance<Ver, ?> instance = createSchemaUpdateInstance(url, options, getManagedAccessFactory());
         instance.setContinueOnError(isContinueOnError());
         instance.setIgnoreFailedDrops(isIgnoreFailedDrops());
-
         return instance;
     }
+
+    protected abstract ResourceSchemaUpdateInstance<Ver, ?> createSchemaUpdateInstance(URL url, ScriptReadOptions options, ManagedAccessFactory factory);
 
     public List<URL> getResourceFiles() {
         return resourceFiles;
